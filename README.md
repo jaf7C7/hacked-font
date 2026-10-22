@@ -22,7 +22,7 @@ After a build the host keeps only `localhost/hacked-builder:latest` (about 630MB
 
 | Path | Purpose |
 |---|---|
-| `hacked.conf` | Family name, chosen alternates and version note. Mounted at run time, so editing it needs no image rebuild. |
+| `hacked.conf` | Family name, chosen alternates (optionally limited to some styles with `@style,style`) and version note. Mounted at run time, so editing it needs no image rebuild. |
 | `build.sh` | Host entry point. Removes the old image when it rebuilds, so only one copy is kept. |
 | `Containerfile` | Debian trixie-slim, `ttfautohint`, a Python venv from the lock file, and the pinned Hack and alt-hack sources. |
 | `container/build-font.sh` | Runs in the container: patches glyphs, strips stale hints, then runs fontmake, Hack's fixes, ttfautohint and the rename. |
@@ -36,7 +36,8 @@ After a build the host keeps only `localhost/hacked-builder:latest` (about 630MB
 
 `u0030-diamond`, `u0033-flattop`, `u003C-wider` + `u003E-wider`, and `u0069-slab` with its 11
 accented and Cyrillic siblings (`u00EC u00ED u00EE u00EF u0129 u012B u012D u012F u0131 u0456 u0457`).
-The i-slab directories only make sense applied together.
+The i-slab directories only make sense applied together. They're applied to Regular and Bold
+only (`@regular,bold` in `hacked.conf`); Italic and Bold Italic keep Hack's default `i`.
 
 ## Decisions and why
 
@@ -58,7 +59,7 @@ The i-slab directories only make sense applied together.
   To regenerate the lock, run `pip install fontmake && pip freeze` in a fresh trixie container,
   replace `container/requirements.lock`, then run `./build.sh --rebuild-image`.
 - **Naming.** Pickers show only `Hacked`. The version string (name ID 5) also carries
-  ttfautohint's settings plus `Hacked: 0-diamond 3-flattop <>-wider i-slab`, so an installed
+  ttfautohint's settings plus `Hacked: 0-diamond 3-flattop <>-wider i-slab(upright)`, so an installed
   copy records what it contains.
 - **TTF only.** No woff or woff2.
 

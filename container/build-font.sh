@@ -24,21 +24,39 @@ cp -a "$SRC_HACK" "$WORK"
 cd "$WORK"
 
 echo "== Applying alternates"
-for alt in "${ALTERNATES[@]}"; do
+for entry in "${ALTERNATES[@]}"; do
+    # "u0069-slab@regular,bold" limits an alternate to those styles; no suffix means all.
+    alt="${entry%%@*}"
     [[ -d "$SRC_ALT/glyphs/$alt" ]] || { echo "Unknown alternate: $alt" >&2; exit 1; }
-    for style in "${STYLES[@]}"; do
+    if [[ "$entry" == *@* ]]; then
+        IFS=, read -ra wanted <<< "${entry#*@}"
+        targets=()
+        for w in "${wanted[@]}"; do
+            match=""
+            for style in "${STYLES[@]}"; do
+                [[ "${style,,}" == "$w" ]] && match="$style"
+            done
+            [[ -n "$match" ]] || { echo "Unknown style '$w' in $entry" >&2; exit 1; }
+            targets+=("$match")
+        done
+    else
+        targets=("${STYLES[@]}")
+    fi
+
+    cp_hex="${alt%%-*}"          # u0030
+    cp_hex="${cp_hex#u}"         # 0030
+    for style in "${targets[@]}"; do
         dest="source/Hack-$style.ufo/glyphs"
         for glif in "$SRC_ALT/glyphs/$alt/${style,,}"/*.glif; do
             # alt-hack files replace existing ones; a new file would mean a path mismatch.
             [[ -f "$dest/${glif##*/}" ]] || { echo "No existing $dest/${glif##*/} to replace" >&2; exit 1; }
             cp "$glif" "$dest/"
         done
+        # Drop hand-tuned hints for the replaced code point; they target the old outline.
+        sed -i -e "/^uni${cp_hex} /d" -e "/^# U+${cp_hex} /d" \
+            "postbuild_processing/tt-hinting/Hack-$style-TA.txt"
     done
-    # Drop hand-tuned hints for the replaced code point; they target the old outline.
-    cp_hex="${alt%%-*}"          # u0030
-    cp_hex="${cp_hex#u}"         # 0030
-    sed -i -e "/^uni${cp_hex} /d" -e "/^# U+${cp_hex} /d" postbuild_processing/tt-hinting/*-TA.txt
-    echo "   $alt"
+    echo "   $alt (${targets[*]})"
 done
 
 echo "== Compiling (fontmake $(fontmake --version 2>&1 | tail -1))"
