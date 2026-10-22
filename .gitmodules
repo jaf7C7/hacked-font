@@ -1,0 +1,6 @@
+[submodule "src/alt-hack"]
+	path = src/alt-hack
+	url = https://github.com/source-foundry/alt-hack.git
+[submodule "src/hack"]
+	path = src/hack
+	url = https://github.com/source-foundry/Hack.git

@@ -1,0 +1,132 @@
+<title>alt-hack Specimen</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+  /* Layout: a proof sheet. One band per glyph slot; Hack's default sits first, alternates follow in equal columns. */
+  :root {
+    --bg: #f3f5f8;
+    --panel: #ffffff;
+    --ink: #121722;
+    --muted: #5d6676;
+    --rule: #d6dbe3;
+    --guide: #e4e8ee;
+    --accent: #0a62c9;
+    --accent-soft: #e2edfb;
+    --sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --mono: "IBM Plex Mono", ui-monospace, "DejaVu Sans Mono", monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0e1116; --panel: #161a22; --ink: #e5e9f0; --muted: #8d97a8;
+      --rule: #29303c; --guide: #222833; --accent: #6cb0ff; --accent-soft: #17263a; color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0e1116; --panel: #161a22; --ink: #e5e9f0; --muted: #8d97a8;
+    --rule: #29303c; --guide: #222833; --accent: #6cb0ff; --accent-soft: #17263a; color-scheme: dark;
+  }
+  body {
+    background: var(--bg); color: var(--ink); font: 15px/1.5 var(--sans);
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    padding-block: 32px 64px;
+  }
+  .wrap { max-width: 1280px; margin: 0 auto; display: grid; gap: 40px; }
+  h1 { font-size: 30px; line-height: 1.15; font-weight: 600; margin: 0; text-wrap: balance; letter-spacing: -0.01em; }
+  h1 code { font-family: var(--mono); font-weight: 500; }
+  .intro { display: grid; gap: 14px; max-width: 68ch; }
+  .intro p { margin: 0; color: var(--muted); }
+  .intro strong { color: var(--ink); font-weight: 500; }
+  .hlk { color: var(--accent); font-weight: 500; }
+
+  .bar {
+    position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5;
+    display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: center; justify-content: space-between;
+    background: var(--bg); padding-block: 10px; border-bottom: 1px solid var(--rule);
+  }
+  body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--bg); }
+  .toc { display: flex; flex-wrap: wrap; gap: 6px; }
+  .toc a {
+    display: inline-flex; gap: 8px; align-items: baseline; text-decoration: none; color: var(--ink);
+    font: 500 15px var(--mono); padding: 4px 10px; border: 1px solid var(--rule); border-radius: 4px; background: var(--panel);
+  }
+  .toc a span { font: 400 12px var(--sans); color: var(--muted); }
+  .toc a:hover, .toc a:focus-visible { border-color: var(--accent); outline: none; }
+  .seg { display: inline-flex; border: 1px solid var(--rule); border-radius: 4px; overflow: hidden; background: var(--panel); }
+  .seg-label { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-right: 8px; }
+  .seg button {
+    font: 500 13px var(--sans); color: var(--muted); background: none; border: 0; padding: 6px 12px; cursor: pointer;
+  }
+  .seg button + button { border-left: 1px solid var(--rule); }
+  .seg button[aria-pressed="true"] { background: var(--accent-soft); color: var(--accent); }
+  .seg button:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+
+  section { display: grid; gap: 16px; scroll-margin-top: 80px; }
+  section header { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 16px; }
+  h2 { font-size: 20px; font-weight: 600; margin: 0; }
+  .meta { margin: 0; display: flex; gap: 14px; font: 13px var(--mono); color: var(--muted); }
+  .cols { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); }
+  .col {
+    margin: 0; min-width: 0; display: grid; gap: 12px; align-content: start;
+    background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; padding: 14px;
+  }
+  .col.def { background: transparent; border-style: dashed; }
+  figcaption { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 4px 10px; align-items: baseline; }
+  .opt { font-weight: 600; font-size: 15px; }
+  .col.def .opt { color: var(--muted); font-weight: 500; }
+  figcaption code { font: 12px var(--mono); color: var(--muted); overflow-wrap: anywhere; }
+  .cells { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .cell { display: grid; justify-items: center; gap: 2px; padding-block: 6px 4px; border-radius: 4px; background: var(--bg); min-width: 0; }
+  .col.def .cell { background: var(--panel); }
+  .sl { font-size: 11px; color: var(--muted); letter-spacing: 0.04em; text-transform: uppercase; }
+  svg { fill: var(--ink); display: block; }
+  svg.g { height: 64px; width: calc(var(--n) * 0.602 * 64px); max-width: 100%; }
+  .guides line { stroke: var(--guide); stroke-width: 10; }
+  .sample { overflow-x: auto; border-top: 1px solid var(--rule); padding-top: 10px; }
+  .sample svg { height: 22px; width: calc(var(--n) * 0.602 * 22px); }
+  .sample .hl { fill: var(--accent); }
+  .sample { display: none; }
+  body:not([data-s]) .sample[data-style="Regular"],
+  body[data-s="Regular"] .sample[data-style="Regular"],
+  body[data-s="Bold"] .sample[data-style="Bold"],
+  body[data-s="Italic"] .sample[data-style="Italic"],
+  body[data-s="BoldItalic"] .sample[data-style="BoldItalic"] { display: block; }
+  footer { color: var(--muted); font-size: 13px; max-width: 68ch; }
+  footer a { color: var(--accent); }
+  @media (max-width: 480px) { h1 { font-size: 24px; } svg.g { height: 52px; width: calc(var(--n) * 0.602 * 52px); } }
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>{{DEFS}}</defs></svg>
+
+<div class="wrap">
+  <div class="intro">
+    <h1>Hack alternates, side by side</h1>
+    <p>Every alternate glyph in <code>alt-hack</code>, drawn straight from its <code>.glif</code> source next to Hack v3.003's default. Each card is one proposed font build: <strong>{{NBUILDS}} builds</strong> from {{NDIRS}} glyph directories, since pairs like <code>( )</code> and the accented <code>i</code> forms change together.</p>
+    <p>Sample lines mark the swapped characters in <span class="hlk">blue</span>. Faint lines in the glyph boxes are baseline, x-height and cap height.</p>
+  </div>
+
+  <div class="bar">
+    <nav class="toc" aria-label="Glyph slots">{{TOC}}</nav>
+    <div><span class="seg-label">Sample style</span><span class="seg" role="group" aria-label="Sample style">
+      <button type="button" data-s="Regular" aria-pressed="true">Regular</button>
+      <button type="button" data-s="Bold" aria-pressed="false">Bold</button>
+      <button type="button" data-s="Italic" aria-pressed="false">Italic</button>
+      <button type="button" data-s="BoldItalic" aria-pressed="false">Bold Italic</button>
+    </span></div>
+  </div>
+
+  {{SECTIONS}}
+
+  <footer>Sources: <a href="https://github.com/source-foundry/Hack/tree/v3.003">source-foundry/Hack v3.003</a> and <a href="https://github.com/source-foundry/alt-hack">source-foundry/alt-hack</a>. Outlines are unhinted, so on-screen rendering of the built fonts at small sizes will differ slightly.</footer>
+</div>
+
+<script>
+  document.body.dataset.s = "Regular";
+  document.querySelectorAll(".seg button").forEach(function (b) {
+    b.addEventListener("click", function () {
+      document.body.dataset.s = b.dataset.s;
+      document.querySelectorAll(".seg button").forEach(function (o) { o.setAttribute("aria-pressed", String(o === b)); });
+    });
+  });
+</script>
