@@ -7,8 +7,8 @@ the original Hack without name collisions.
 ## Build and install
 
 ```sh
-./build.sh                      # builds the image if missing, then the fonts → dist/
-./build.sh --rebuild-image      # refresh the image after changing Containerfile or the lock file
+bash build.bash                      # builds the image if missing, then the fonts → dist/
+bash build.bash --rebuild-image      # refresh the image after changing Containerfile or the lock file
 cp dist/*.ttf ~/.local/share/fonts/ && fc-cache -f
 ```
 
@@ -57,7 +57,7 @@ only (`@regular,bold` in `hacked.conf`); Italic and Bold Italic keep Hack's defa
   says to. With the current picks, only `uni0030` in `Hack-Regular-TA.txt` has any.
 - **Python deps are pinned.** Hack's own build runs `pip install --upgrade fontmake` unpinned.
   To regenerate the lock, run `pip install fontmake && pip freeze` in a fresh trixie container,
-  replace `container/requirements.lock`, then run `./build.sh --rebuild-image`.
+  replace `container/requirements.lock`, then run `bash build.bash --rebuild-image`.
 - **Naming.** Pickers show only `Hacked`. The version string (name ID 5) also carries
   ttfautohint's settings plus `Hacked: 0-diamond 3-flattop <>-wider i-slab(upright)`, so an installed
   copy records what it contains.

@@ -1,7 +1,7 @@
 #!/bin/bash
 # Build the "Hacked" font in a podman container.
 #
-# Usage: ./build.sh [--rebuild-image]
+# Usage: bash build.bash [--rebuild-image]
 #
 # Builds the builder image if missing (the only step that downloads anything),
 # then runs the font build offline in a throwaway container. Output goes to
